@@ -1,4 +1,4 @@
-# About
+## About
 
 This repo is an Polymer element creating a glitch effect.
 
@@ -8,7 +8,7 @@ This repo is an Polymer element creating a glitch effect.
 bower install polymer-glitch
 ```
 
-# Usage
+## Usage
 
 ```html
 <x-glitch src="awesome.jpg"></x-glitch>
