@@ -1,0 +1,18 @@
+{
+  "name": "polymer-glitch",
+  "version": "0.0.0",
+  "author": "Anna Selezniova",
+  "keywords": [
+    "web-components",
+    "polymer elements",
+    "glitch"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0"
+  }
+}

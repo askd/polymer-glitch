@@ -1,0 +1,160 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="x-glitch">
+
+
+  <template>
+
+    <style>
+      :host {
+        position: relative;
+        display: block;
+        overflow: hidden;
+        line-height: 0;
+      }
+      img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+      img:not(:first-child) {
+        position: absolute;
+        top: 0;
+      }
+      img:nth-child(2) {
+        left: -1px;
+      }
+      img:nth-child(3) {
+        left: 1px;
+      }
+    </style>
+
+    <!-- local DOM goes here -->
+    <img src=[[src]] /><img src=[[src]] /><img src=[[src]] />
+
+  </template>
+
+  <script>
+  Polymer({
+    is: 'x-glitch',
+
+    properties: {
+      src: {
+        type: String
+      },
+    },
+
+    created: function() {
+      this.listeners = {
+        update:           this.update.bind(this),
+        visibilityChange: this.visibilityChange.bind(this),
+      };
+
+      this.interval = null;
+    },
+
+    ready: function() {
+      this.images = this.querySelectorAll('img');
+    },
+
+    attached: function() {
+      this.start();
+      this.bind();
+    },
+
+    detached: function() {
+      this.unbind();
+      this.stop();
+    },
+
+    start: function() {
+      if (this.interval) return;
+
+      this.interval = this.requestInterval(this.listeners.update, 120);
+    },
+
+    stop: function() {
+      if (!this.interval) return;
+
+      this.clearRequestInterval(this.interval);
+      this.interval = null;
+    },
+
+    update: function() {
+      const width = this.offsetWidth;
+      const height = this.offsetHeight;
+
+      for (var i=1; i<3; i++) {
+        this.images[i].style.clip = this.getRect(i, width, height, -1);
+      }
+    },
+
+    visibilityChange: function() {
+      if (document.visibilityState === 'hidden') {
+        this.stop();
+      } else {
+        this.start();
+      }
+    },
+
+    bind: function() {
+      document.addEventListener('visibilitychange', this.listeners.visibilityChange);
+    },
+
+    unbind: function() {
+      document.removeEventListener('visibilitychange', this.listeners.visibilityChange);
+    },
+
+    requestInterval: function(fn, delay) {
+      if (!window.requestAnimationFrame) {
+        return window.setInterval(fn, delay);
+      }
+
+      var start = new Date().getTime();
+      const handle = {};
+
+      function loop() {
+        const current = new Date().getTime();
+
+        if (current - start >= delay) {
+          fn.call();
+          start = new Date().getTime();
+        }
+
+        handle.value = window.requestAnimationFrame(loop);
+      };
+
+      handle.value = window.requestAnimationFrame(loop);
+
+      return handle;
+    },
+
+    clearRequestInterval: function(handle) {
+      if (!window.cancelAnimationFrame) {
+        window.clearInterval(handle);
+        return;
+      }
+      window.cancelAnimationFrame(handle.value)
+    },
+
+    setSrc: function(src) {
+      if (!src) return;
+
+      for (var i=0; i<3; i++) {
+        this.images[i].setAttribute('src', src);
+      }
+    },
+
+    getRand: function(value) {
+      return Math.round(Math.random() * value);
+    },
+
+    getRect: function(num, width, height, size) {
+      const height1 = this.getRand(height);
+      const height2 = this.getRand(height);
+      const rect = height1 + 'px,' + width + 'px,' + height2 + 'px,0';
+      return 'rect(' + rect + ')';
+    }
+  });
+  </script>
+
+</dom-module>
